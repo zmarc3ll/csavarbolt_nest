@@ -2,6 +2,7 @@ import { Body, Controller, Delete, Get, Param, Post, Render } from '@nestjs/comm
 import { DataSource } from 'typeorm';
 import { AppService } from './app.service';
 import CsavarData from './CsavarData';
+import RendelesData from './RendelesData';
 
 @Controller()
 export class AppController {
@@ -35,10 +36,30 @@ export class AppController {
     csavarbolt.delete(id);
   }
 
-  @Post('csavar/:id/rendeles')
-  orderCsavar(@Param('id') id: number) {
-    const csavarbolt = this.dataSource.getRepository(CsavarData);
-
+  @Post('api/csavar/:id/rendeles')
+  async csavarRendel(
+    @Body() rendeles: RendelesData,
+    @Param('id') csavarId: number,
+  ) {
+    const rendelesRep = this.dataSource.getRepository(RendelesData);
+    rendeles.id = undefined;
+    rendeles.csavar_id = csavarId;
+     const csavarRep = this.dataSource.getRepository(CsavarData);
+    const rendeltCsavarok = await csavarRep.findOneBy({ id: csavarId });
+    rendeltCsavarok.keszlet = rendeltCsavarok.keszlet - rendeles.db;
+    csavarRep.save(rendeltCsavarok);
+    rendelesRep.save(rendeles);
   }
 
+  @Get('api/csavar/rendeles')
+  async listRendeles() {
+    const rendelesRep = this.dataSource.getRepository(RendelesData);
+    return await rendelesRep.find();
+  }
+
+  @Delete('api/csavar/rendeles/:id')
+  deleteRendeles(@Param('id') id: number) {
+    const rendelesRep = this.dataSource.getRepository(RendelesData);
+    rendelesRep.delete(id);
+  }
 }
