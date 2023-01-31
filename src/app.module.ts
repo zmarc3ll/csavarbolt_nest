@@ -2,6 +2,8 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import csavarData from './CsavarData';
+import RendelesData from './RendelesData';
 
 @Module({
   imports: [
@@ -10,10 +12,8 @@ import { AppService } from './app.service';
       host: 'localhost',
       username: 'root',
       password: '',
-      database: 'database',
-      entities: [
-        /* List of entities here */
-      ],
+      database: 'csavarbolt',
+      entities: [csavarData, RendelesData],
       synchronize: true,
     }),
   ],
